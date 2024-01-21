@@ -1,8 +1,9 @@
 import psycopg2
-import product
 from os import getenv
+from product import Product
+from price import Price
 
-class db:
+class Db:
 
     def create(self):
         commands = ["""
@@ -36,27 +37,27 @@ class db:
         password=getenv('DATABASE_PASSWORD'))
         self.cur = self.conn.cursor()
 
-    def add_price(self, price):
+    def add_price(self, price : Price):
         self.cur.execute("INSERT INTO prices(product_id, price, change_date) VALUES('" + price.product.id + "','" + price.price + "','" + price.date +  "')")  
 
-    def add_product(self, product):
+    def add_product(self, product : Product):
         self.cur.execute("INSERT INTO products(product_name, image_url, url) VALUES('" + product.name + "','" + product.image_url + "','" + product.url +  "')")
 
-    def get_product_id(self, product):
+    def get_product_id(self, product : Product):
         self.cur.execute("SELECT product_id FROM products WHERE product_name LIKE '" + product.name + "'")
         result = self.cur.fetchone()
         product.id = result[0]
     
-    def get_product_with_name(self, name):
+    def get_product_with_name(self, name : str):
         self.cur.execute("SELECT * FROM products WHERE product_name LIKE '" + name + "'")
         result = self.cur.fetchone()
-        new_product = product.product(result[1], result[3], result[2], result[1])
+        new_product = Product(result[1], result[3], result[2], result[1])
         return new_product
     
-    def get_product_with_id(self, _id):
+    def get_product_with_id(self, _id : int):
         self.cur.execute("SELECT * FROM products WHERE product_id = '" + _id + "'")
         result = self.cur.fetchone()
-        new_product = product.product(result[1], result[3], result[2], result[1])
+        new_product = Product(result[1], result[3], result[2], result[1])
         return new_product
 
     def commit(self):

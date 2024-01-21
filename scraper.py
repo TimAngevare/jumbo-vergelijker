@@ -1,10 +1,10 @@
 import requests
 from bs4 import BeautifulSoup
 from time import sleep
-import product
-import price
+from product import Product
+from price import Price
 
-class scraper:
+class Scraper:
     def __init__(self):
         self.url = 'https://www.jumbo.com'
 
@@ -18,8 +18,8 @@ class scraper:
         price_container = element.find('div', _class="current-price")
         euros = price_container.find('span', _class="whole")
         cents = price_container.find('span', _class="fractional")
-        product = product.product(name, product_url, image_url, None)
-        price = price.price(float(euros + '.' + cents), None, product)
+        product = Product(name, product_url, image_url, None)
+        price = Price(float(euros + '.' + cents), None, product)
         return price
 
 
@@ -31,8 +31,14 @@ class scraper:
             page = requests.get(base_url + str(count * 24))
             sleep(3)
             soup = BeautifulSoup(page.content, 'html.parser')
-            soup.find_all("article", class_="product-container")
+            articles = soup.find_all("article", class_="product-container")
+            if len(article) == 0:
+                False
+            for article in articles:
+                products.append(self.create_product_price_from_element(article))
+
             count += 1
+        return products
 
     
 

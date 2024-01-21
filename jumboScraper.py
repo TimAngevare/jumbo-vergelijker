@@ -1,9 +1,12 @@
-import databaseActions as db
-import product
-import price
+from scraper import Scraper
+from databaseActions import Db
 
-db = db.db()
-# product = product.product("banana", "https://banana.com", "https://banana.com/image")
-# db.add_product(product)
-product = db.get_product_with_id('2')
-print(product.name)
+s = Scraper()
+db = Db()
+
+prices = s.retrieve_products()
+for p in prices:
+    print(p.toString())
+    db.add_product(p.product)
+    db.add_price(p)
+Db.commit()
